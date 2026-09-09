@@ -36,6 +36,7 @@ export default function MonthCalendar({
   onMonthChange,
   selectedDate,
   onSelectDate,
+  onAddForDate,
   itemsByDate,
 }) {
   const year = currentMonth.getFullYear()
@@ -101,7 +102,10 @@ export default function MonthCalendar({
             <button
               key={key}
               type="button"
-              onClick={() => onSelectDate(cellDate)}
+              onClick={() => {
+                onSelectDate(cellDate)
+                if (dayItems.length === 0) onAddForDate?.(cellDate)
+              }}
               className={`flex min-h-[52px] flex-col gap-1 bg-paper-raised p-1 text-left align-top transition-colors md:min-h-[92px] md:p-1.5 ${
                 isSelected ? 'ring-2 ring-inset ring-harbor' : 'hover:bg-paper'
               } ${!inCurrentMonth ? 'opacity-40' : ''}`}

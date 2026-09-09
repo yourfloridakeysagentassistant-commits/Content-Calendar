@@ -10,7 +10,7 @@ function formatTime(timeString) {
   return `${hour12}:${m} ${period}`
 }
 
-export default function TodaysContent({ date, items, loading }) {
+export default function TodaysContent({ date, items, loading, onAdd }) {
   const label = date.toLocaleDateString('en-US', {
     weekday: 'long',
     month: 'long',
@@ -19,7 +19,18 @@ export default function TodaysContent({ date, items, loading }) {
 
   return (
     <div className="rounded-2xl border border-line bg-paper-raised p-5 shadow-soft">
-      <h2 className="font-serif text-lg text-ink">{label}</h2>
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="font-serif text-lg text-ink">{label}</h2>
+        {onAdd && (
+          <button
+            type="button"
+            onClick={onAdd}
+            className="shrink-0 rounded-lg border border-line px-2.5 py-1 text-xs font-medium text-ink-soft hover:bg-paper"
+          >
+            + Add
+          </button>
+        )}
+      </div>
 
       {loading ? (
         <p className="mt-4 text-sm text-ink-soft">Loading…</p>
@@ -42,6 +53,13 @@ export default function TodaysContent({ date, items, loading }) {
                 <p className="mt-0.5 text-xs opacity-80">
                   {[item.content_type, formatTime(item.post_time)].filter(Boolean).join(' · ')}
                 </p>
+                {item.file_url && (
+                  <img
+                    src={item.file_url}
+                    alt={item.file_name || item.title}
+                    className="mt-2 h-20 w-full rounded-lg object-cover"
+                  />
+                )}
               </li>
             )
           })}

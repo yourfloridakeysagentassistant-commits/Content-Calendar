@@ -22,6 +22,7 @@ export default function Calendar() {
   const [modalOpen, setModalOpen] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(null)
+  const [createError, setCreateError] = useState(null)
 
   const monthRange = useMemo(() => {
     const start = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1)
@@ -68,24 +69,56 @@ export default function Calendar() {
     return itemsByDate[key] || []
   }, [itemsByDate, selectedDate])
 
-  const handleCreate = async (payload) => {
+  const handleCreate = async (payload, file) => {
     setSaving(true)
+    setCreateError(null)
     const { data: userData } = await supabase.auth.getUser()
+    const userId = userData?.user?.id
+
+    let fileFields = {}
+    if (file) {
+      const filePath = `${userId}/${Date.now()}-${file.name}`
+      const { error: uploadError } = await supabase.storage
+        .from('content-uploads')
+        .upload(filePath, file)
+
+      if (uploadError) {
+        setSaving(false)
+        setCreateError(`File upload failed: ${uploadError.message}`)
+        return
+      }
+
+      const { data: publicUrlData } = supabase.storage
+        .from('content-uploads')
+        .getPublicUrl(filePath)
+
+      fileFields = {
+        [CONTENT_COLUMNS.fileUrl]: publicUrlData?.publicUrl || null,
+        [CONTENT_COLUMNS.fileName]: file.name,
+      }
+    }
 
     const { error: insertError } = await supabase.from(CONTENT_TABLE).insert({
       ...payload,
-      [CONTENT_COLUMNS.createdBy]: userData?.user?.id,
+      ...fileFields,
+      [CONTENT_COLUMNS.createdBy]: userId,
     })
 
     setSaving(false)
 
     if (insertError) {
-      setError(insertError.message)
+      setCreateError(insertError.message)
       return
     }
 
     setModalOpen(false)
     fetchItems()
+  }
+
+  const openCreateModal = (date) => {
+    if (date) setSelectedDate(date)
+    setCreateError(null)
+    setModalOpen(true)
   }
 
   return (
@@ -94,7 +127,7 @@ export default function Calendar() {
         <h1 className="font-serif text-2xl text-ink">Calendar</h1>
         <button
           type="button"
-          onClick={() => setModalOpen(true)}
+          onClick={() => openCreateModal(selectedDate)}
           className="rounded-xl bg-coral px-4 py-2.5 text-sm font-medium text-white hover:bg-coral-dark"
         >
           + Create Content
@@ -114,12 +147,18 @@ export default function Calendar() {
             onMonthChange={setCurrentMonth}
             selectedDate={selectedDate}
             onSelectDate={setSelectedDate}
+            onAddForDate={openCreateModal}
             itemsByDate={itemsByDate}
           />
           <PlatformLegend />
         </div>
         <div className="flex flex-col gap-6">
-          <TodaysContent date={selectedDate} items={selectedDateItems} loading={loading} />
+          <TodaysContent
+            date={selectedDate}
+            items={selectedDateItems}
+            loading={loading}
+            onAdd={() => openCreateModal(selectedDate)}
+          />
           <QuickIdea />
         </div>
       </div>
@@ -130,6 +169,7 @@ export default function Calendar() {
           onClose={() => setModalOpen(false)}
           onCreate={handleCreate}
           saving={saving}
+          error={createError}
         />
       )}
     </div>
