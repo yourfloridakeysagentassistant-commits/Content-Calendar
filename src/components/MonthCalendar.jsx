@@ -52,7 +52,7 @@ export default function MonthCalendar({
   const goToNextMonth = () => onMonthChange(new Date(year, month + 1, 1))
 
   return (
-    <div className="rounded-2xl border border-line bg-paper-raised p-5 shadow-soft md:p-6">
+    <div className="rounded-2xl border border-line bg-paper-raised p-3 shadow-soft md:p-6">
       <div className="mb-5 flex items-center justify-between">
         <h2 className="font-serif text-2xl text-ink">{monthLabel}</h2>
         <div className="flex items-center gap-1">
@@ -102,7 +102,7 @@ export default function MonthCalendar({
               key={key}
               type="button"
               onClick={() => onSelectDate(cellDate)}
-              className={`flex min-h-[92px] flex-col gap-1 bg-paper-raised p-1.5 text-left align-top transition-colors ${
+              className={`flex min-h-[52px] flex-col gap-1 bg-paper-raised p-1 text-left align-top transition-colors md:min-h-[92px] md:p-1.5 ${
                 isSelected ? 'ring-2 ring-inset ring-harbor' : 'hover:bg-paper'
               } ${!inCurrentMonth ? 'opacity-40' : ''}`}
             >
@@ -114,7 +114,24 @@ export default function MonthCalendar({
                 {cellDate.getDate()}
               </span>
 
-              <div className="flex flex-col gap-1">
+              {/* Mobile: compact colored dots only */}
+              {dayItems.length > 0 && (
+                <div className="flex flex-wrap gap-0.5 md:hidden">
+                  {dayItems.slice(0, 4).map((item) => {
+                    const style = getPlatformStyle(item.platform)
+                    return (
+                      <span
+                        key={item.id}
+                        className="h-1.5 w-1.5 rounded-full"
+                        style={{ backgroundColor: style.text }}
+                      />
+                    )
+                  })}
+                </div>
+              )}
+
+              {/* Tablet/desktop: full chips */}
+              <div className="hidden flex-col gap-1 md:flex">
                 {visibleItems.map((item) => {
                   const style = getPlatformStyle(item.platform)
                   return (

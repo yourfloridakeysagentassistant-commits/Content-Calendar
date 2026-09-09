@@ -89,7 +89,7 @@ export default function Calendar() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-5 py-6 md:px-8 md:py-8">
+    <div className="mx-auto max-w-6xl px-3 py-5 sm:px-5 sm:py-6 md:px-8 md:py-8">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="font-serif text-2xl text-ink">Calendar</h1>
         <button
