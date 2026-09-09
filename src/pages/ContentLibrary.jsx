@@ -19,6 +19,7 @@ export default function ContentLibrary() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [activeFilter, setActiveFilter] = useState('All')
+  const [deletingId, setDeletingId] = useState(null)
 
   const fetchItems = useCallback(async () => {
     setLoading(true)
@@ -47,6 +48,23 @@ export default function ContentLibrary() {
     )
     return items.filter((item) => item[CONTENT_COLUMNS.status] === targetKey)
   }, [items, activeFilter])
+
+  const handleDelete = async (id) => {
+    setDeletingId(id)
+    const { error: deleteError } = await supabase
+      .from(CONTENT_TABLE)
+      .delete()
+      .eq(CONTENT_COLUMNS.id, id)
+
+    setDeletingId(null)
+
+    if (deleteError) {
+      setError(deleteError.message)
+      return
+    }
+
+    fetchItems()
+  }
 
   return (
     <div className="mx-auto max-w-5xl px-5 py-6 md:px-8 md:py-8">
@@ -89,6 +107,7 @@ export default function ContentLibrary() {
                 <th className="px-5 py-3 font-normal">Type</th>
                 <th className="px-5 py-3 font-normal">Date</th>
                 <th className="px-5 py-3 font-normal">Status</th>
+                <th className="px-5 py-3 font-normal"></th>
               </tr>
             </thead>
             <tbody>
@@ -114,6 +133,29 @@ export default function ContentLibrary() {
                       <span className="rounded-full bg-harbor-soft px-2.5 py-0.5 text-xs text-harbor-dark">
                         {STATUS_LABEL[item.status] || item.status}
                       </span>
+                    </td>
+                    <td className="px-5 py-3.5 text-right">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (window.confirm(`Delete "${item.title}"? This can't be undone.`)) {
+                            handleDelete(item.id)
+                          }
+                        }}
+                        disabled={deletingId === item.id}
+                        className="rounded-md p-1.5 text-ink-soft opacity-60 hover:opacity-100 disabled:opacity-30"
+                        aria-label={`Delete ${item.title}`}
+                      >
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                          <path
+                            d="M2.5 3.5h9M5.5 3.5V2a.5.5 0 01.5-.5h2a.5.5 0 01.5.5v1.5M5.5 6.5v4M8.5 6.5v4M3.5 3.5l.5 8a1 1 0 001 1h4a1 1 0 001-1l.5-8"
+                            stroke="currentColor"
+                            strokeWidth="1.1"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </button>
                     </td>
                   </tr>
                 )

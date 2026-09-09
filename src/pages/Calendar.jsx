@@ -23,6 +23,7 @@ export default function Calendar() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(null)
   const [createError, setCreateError] = useState(null)
+  const [deletingId, setDeletingId] = useState(null)
 
   const monthRange = useMemo(() => {
     const start = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1)
@@ -88,12 +89,18 @@ export default function Calendar() {
         return
       }
 
-      const { data: publicUrlData } = supabase.storage
+      const { data: signedUrlData, error: signedUrlError } = await supabase.storage
         .from('content-uploads')
-        .getPublicUrl(filePath)
+        .createSignedUrl(filePath, 60 * 60 * 24 * 365) // valid 1 year
+
+      if (signedUrlError) {
+        setSaving(false)
+        setCreateError(`File uploaded but couldn't generate a link: ${signedUrlError.message}`)
+        return
+      }
 
       fileFields = {
-        [CONTENT_COLUMNS.fileUrl]: publicUrlData?.publicUrl || null,
+        [CONTENT_COLUMNS.fileUrl]: signedUrlData?.signedUrl || null,
         [CONTENT_COLUMNS.fileName]: file.name,
       }
     }
@@ -119,6 +126,23 @@ export default function Calendar() {
     if (date) setSelectedDate(date)
     setCreateError(null)
     setModalOpen(true)
+  }
+
+  const handleDelete = async (id) => {
+    setDeletingId(id)
+    const { error: deleteError } = await supabase
+      .from(CONTENT_TABLE)
+      .delete()
+      .eq(CONTENT_COLUMNS.id, id)
+
+    setDeletingId(null)
+
+    if (deleteError) {
+      setError(deleteError.message)
+      return
+    }
+
+    fetchItems()
   }
 
   return (
@@ -158,6 +182,8 @@ export default function Calendar() {
             items={selectedDateItems}
             loading={loading}
             onAdd={() => openCreateModal(selectedDate)}
+            onDelete={handleDelete}
+            deletingId={deletingId}
           />
           <QuickIdea />
         </div>
