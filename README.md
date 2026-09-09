@@ -4,10 +4,12 @@ React + Vite + Tailwind + Supabase app for planning and reviewing content.
 
 ## Pages
 
-- **Calendar** (home) — month view, today's content panel, create content
+- **Calendar** (home) — Month/Week/List views, mini calendar, today's content, quick idea capture, create content (with photo/video upload)
 - **Ideas** — capture and browse raw ideas
-- **Content Library** — all content, filterable by status
+- **Content Library** — all content, filterable by status, deletable
 - **Review** — approve or send back content in review
+- **Analytics** — counts by status and by platform
+- **Brand Assets** — upload/browse logos and reference files
 - **Settings** — account info, sign out
 
 ## Setup

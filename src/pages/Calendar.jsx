@@ -1,7 +1,12 @@
 import { useEffect, useMemo, useState, useCallback } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient.js'
 import { CONTENT_TABLE, CONTENT_COLUMNS } from '../lib/schema.js'
+import { useCalendarContext } from '../lib/CalendarContext.jsx'
 import MonthCalendar from '../components/MonthCalendar.jsx'
+import WeekView from '../components/WeekView.jsx'
+import ListView from '../components/ListView.jsx'
+import ViewToggle from '../components/ViewToggle.jsx'
 import TodaysContent from '../components/TodaysContent.jsx'
 import CreateContentModal from '../components/CreateContentModal.jsx'
 import PlatformLegend from '../components/PlatformLegend.jsx'
@@ -12,11 +17,11 @@ function toDateKey(date) {
 }
 
 export default function Calendar() {
-  const [currentMonth, setCurrentMonth] = useState(() => {
-    const d = new Date()
-    return new Date(d.getFullYear(), d.getMonth(), 1)
-  })
-  const [selectedDate, setSelectedDate] = useState(() => new Date())
+  const { currentMonth, setCurrentMonth, selectedDate, setSelectedDate } = useCalendarContext()
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  const [view, setView] = useState('month')
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [modalOpen, setModalOpen] = useState(false)
@@ -70,6 +75,24 @@ export default function Calendar() {
     return itemsByDate[key] || []
   }, [itemsByDate, selectedDate])
 
+  const openCreateModal = useCallback(
+    (date) => {
+      if (date) setSelectedDate(date)
+      setCreateError(null)
+      setModalOpen(true)
+    },
+    [setSelectedDate]
+  )
+
+  // Sidebar's "Create Content" button navigates here with this flag set.
+  useEffect(() => {
+    if (location.state?.openCreate) {
+      openCreateModal(selectedDate)
+      navigate(location.pathname, { replace: true, state: {} })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.state])
+
   const handleCreate = async (payload, file) => {
     setSaving(true)
     setCreateError(null)
@@ -122,12 +145,6 @@ export default function Calendar() {
     fetchItems()
   }
 
-  const openCreateModal = (date) => {
-    if (date) setSelectedDate(date)
-    setCreateError(null)
-    setModalOpen(true)
-  }
-
   const handleDelete = async (id) => {
     setDeletingId(id)
     const { error: deleteError } = await supabase
@@ -147,15 +164,18 @@ export default function Calendar() {
 
   return (
     <div className="mx-auto max-w-6xl px-3 py-5 sm:px-5 sm:py-6 md:px-8 md:py-8">
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-serif text-2xl text-ink">Calendar</h1>
-        <button
-          type="button"
-          onClick={() => openCreateModal(selectedDate)}
-          className="rounded-xl bg-coral px-4 py-2.5 text-sm font-medium text-white hover:bg-coral-dark"
-        >
-          + Create Content
-        </button>
+        <div className="flex items-center gap-3">
+          <ViewToggle view={view} onChange={setView} />
+          <button
+            type="button"
+            onClick={() => openCreateModal(selectedDate)}
+            className="rounded-xl bg-coral px-4 py-2.5 text-sm font-medium text-white hover:bg-coral-dark"
+          >
+            + Create Content
+          </button>
+        </div>
       </div>
 
       {error && (
@@ -166,14 +186,27 @@ export default function Calendar() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr,340px]">
         <div>
-          <MonthCalendar
-            currentMonth={currentMonth}
-            onMonthChange={setCurrentMonth}
-            selectedDate={selectedDate}
-            onSelectDate={setSelectedDate}
-            onAddForDate={openCreateModal}
-            itemsByDate={itemsByDate}
-          />
+          {view === 'month' && (
+            <MonthCalendar
+              currentMonth={currentMonth}
+              onMonthChange={setCurrentMonth}
+              selectedDate={selectedDate}
+              onSelectDate={setSelectedDate}
+              onAddForDate={openCreateModal}
+              itemsByDate={itemsByDate}
+            />
+          )}
+          {view === 'week' && (
+            <WeekView
+              selectedDate={selectedDate}
+              onSelectDate={setSelectedDate}
+              onAddForDate={openCreateModal}
+              itemsByDate={itemsByDate}
+            />
+          )}
+          {view === 'list' && (
+            <ListView itemsByDate={itemsByDate} onSelectDate={setSelectedDate} />
+          )}
           <PlatformLegend />
         </div>
         <div className="flex flex-col gap-6">

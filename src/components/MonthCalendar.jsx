@@ -145,7 +145,15 @@ export default function MonthCalendar({
                       style={{ backgroundColor: style.bg, color: style.text }}
                     >
                       <div className="flex items-center gap-1">
-                        <PlatformIcon icon={style.icon} className="shrink-0" />
+                        {item.file_url ? (
+                          <img
+                            src={item.file_url}
+                            alt=""
+                            className="h-3.5 w-3.5 shrink-0 rounded-sm object-cover"
+                          />
+                        ) : (
+                          <PlatformIcon icon={style.icon} className="shrink-0" />
+                        )}
                         <span className="truncate text-[11px] font-medium">{item.title}</span>
                       </div>
                       {(item.content_type || item.post_time) && (

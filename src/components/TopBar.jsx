@@ -1,4 +1,14 @@
 import { useState } from 'react'
+import { NavLink } from 'react-router-dom'
+
+const NAV_ITEMS = [
+  { to: '/', label: 'Calendar' },
+  { to: '/ideas', label: 'Ideas' },
+  { to: '/library', label: 'Content' },
+  { to: '/review', label: 'Review' },
+  { to: '/analytics', label: 'Analytics' },
+  { to: '/settings', label: 'Settings' },
+]
 
 export default function TopBar({ user, onMenuClick }) {
   const [query, setQuery] = useState('')
@@ -9,7 +19,7 @@ export default function TopBar({ user, onMenuClick }) {
     .toUpperCase()
 
   return (
-    <header className="flex items-center gap-4 border-b border-line bg-paper-raised px-5 py-3.5 md:px-8">
+    <header className="flex items-center gap-3 border-b border-line bg-paper-raised px-5 py-3.5 md:px-8">
       <button
         type="button"
         onClick={onMenuClick}
@@ -21,7 +31,26 @@ export default function TopBar({ user, onMenuClick }) {
         </svg>
       </button>
 
-      <div className="relative flex-1 max-w-md">
+      <nav className="hidden items-center gap-1 lg:flex">
+        {NAV_ITEMS.map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            end={item.to === '/'}
+            className={({ isActive }) =>
+              `rounded-lg px-3 py-1.5 text-sm transition-colors ${
+                isActive
+                  ? 'bg-harbor-soft font-medium text-harbor-dark'
+                  : 'text-ink-soft hover:bg-paper hover:text-ink'
+              }`
+            }
+          >
+            {item.label}
+          </NavLink>
+        ))}
+      </nav>
+
+      <div className="relative ml-auto max-w-xs flex-1 lg:max-w-sm">
         <svg
           className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-soft"
           width="16"
@@ -41,10 +70,8 @@ export default function TopBar({ user, onMenuClick }) {
         />
       </div>
 
-      <div className="ml-auto flex items-center gap-3">
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-harbor text-sm font-medium text-white">
-          {initials}
-        </div>
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-harbor text-sm font-medium text-white">
+        {initials}
       </div>
     </header>
   )
