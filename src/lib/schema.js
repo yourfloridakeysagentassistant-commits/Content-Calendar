@@ -59,3 +59,11 @@ export const STATUS = {
   SCHEDULED: 'scheduled',
   PUBLISHED: 'published',
 }
+
+export function isImageFile(name) {
+  return /\.(png|jpe?g|gif|webp|svg|heic|heif)$/i.test(name || '')
+}
+
+export function isVideoFile(name) {
+  return /\.(mp4|mov|m4v|webm|avi|mkv)$/i.test(name || '')
+}

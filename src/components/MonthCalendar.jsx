@@ -1,5 +1,6 @@
 import { getPlatformStyle } from '../lib/platforms.js'
 import PlatformIcon from './PlatformIcon.jsx'
+import { isImageFile } from '../lib/schema.js'
 
 const WEEKDAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
 const MAX_VISIBLE_PER_DAY = 3
@@ -177,7 +178,7 @@ export default function MonthCalendar({
                       style={{ backgroundColor: style.bg, color: style.text }}
                     >
                       <div className="flex items-center gap-1">
-                        {item.file_url ? (
+                        {item.file_url && isImageFile(item.file_name) ? (
                           <img
                             src={item.file_url}
                             alt=""

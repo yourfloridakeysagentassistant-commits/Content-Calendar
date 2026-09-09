@@ -1,5 +1,6 @@
 import { getPlatformStyle } from '../lib/platforms.js'
 import PlatformIcon from './PlatformIcon.jsx'
+import { isVideoFile } from '../lib/schema.js'
 
 function formatTime(timeString) {
   if (!timeString) return null
@@ -85,11 +86,20 @@ export default function TodaysContent({ date, items, loading, onAdd, onEdit, onD
                   {[item.content_type, formatTime(item.post_time)].filter(Boolean).join(' · ')}
                 </p>
                 {item.file_url && (
-                  <img
-                    src={item.file_url}
-                    alt={item.file_name || item.title}
-                    className="mt-2 h-20 w-full rounded-lg object-cover"
-                  />
+                  isVideoFile(item.file_name) ? (
+                    <video
+                      src={item.file_url}
+                      controls
+                      className="mt-2 h-32 w-full rounded-lg bg-black object-contain"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  ) : (
+                    <img
+                      src={item.file_url}
+                      alt={item.file_name || item.title}
+                      className="mt-2 h-20 w-full rounded-lg object-cover"
+                    />
+                  )
                 )}
               </li>
             )

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { STATUS } from '../lib/schema.js'
+import { STATUS, isImageFile, isVideoFile } from '../lib/schema.js'
 import { PLATFORM_STYLES } from '../lib/platforms.js'
 
 const PLATFORMS = Object.keys(PLATFORM_STYLES)
@@ -122,6 +122,23 @@ export default function CreateContentModal({ defaultDate, onClose, onSubmit, sav
             <span className="text-sm text-ink-soft">
               {isEditing && editItem?.file_name ? `Replace photo/video (current: ${editItem.file_name})` : 'Photo or video'}
             </span>
+
+            {isEditing && editItem?.file_url && !file && (
+              isVideoFile(editItem.file_name) ? (
+                <video src={editItem.file_url} controls className="h-32 w-full rounded-lg bg-black object-contain" />
+              ) : isImageFile(editItem.file_name) ? (
+                <img src={editItem.file_url} alt={editItem.file_name} className="h-32 w-full rounded-lg object-cover" />
+              ) : null
+            )}
+
+            {file && (
+              isVideoFile(file.name) ? (
+                <video src={URL.createObjectURL(file)} controls className="h-32 w-full rounded-lg bg-black object-contain" />
+              ) : isImageFile(file.name) ? (
+                <img src={URL.createObjectURL(file)} alt={file.name} className="h-32 w-full rounded-lg object-cover" />
+              ) : null
+            )}
+
             <input
               type="file"
               accept="image/*,video/*"
