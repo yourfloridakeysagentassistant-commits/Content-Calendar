@@ -13,11 +13,6 @@ const NAV_ITEMS = [
 export default function TopBar({ user, onMenuClick }) {
   const [query, setQuery] = useState('')
 
-  const initials = (user?.email || 'U')
-    .split('@')[0]
-    .slice(0, 2)
-    .toUpperCase()
-
   return (
     <header className="flex items-center gap-3 border-b border-line bg-paper-raised px-5 py-3.5 md:px-8">
       <button
@@ -68,10 +63,6 @@ export default function TopBar({ user, onMenuClick }) {
           placeholder="Search content"
           className="w-full rounded-xl border border-line bg-paper py-2 pl-9 pr-3 text-sm text-ink placeholder:text-ink-soft/60 focus:border-harbor focus:outline-none"
         />
-      </div>
-
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-harbor text-sm font-medium text-white">
-        {initials}
       </div>
     </header>
   )
