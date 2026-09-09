@@ -25,27 +25,44 @@ npm run dev
 | `VITE_SUPABASE_URL` | Your Supabase project URL |
 | `VITE_SUPABASE_ANON_KEY` | Your Supabase anon/public key |
 
-## Database schema this app expects
+## Database schema
 
-This app was built without access to the live schema, so it assumes one table,
-documented in full — with column names — in `src/lib/schema.js`. That file is
-the single source of truth every query reads from:
+Confirmed against the live database. Every query reads table and column names
+from `src/lib/schema.js` only — that's the single place to edit if this ever
+changes.
 
 **`content_items`**
 
-| column | type | notes |
-|---|---|---|
-| `id` | uuid | primary key |
-| `title` | text | required |
-| `content_type` | text | e.g. "Instagram Post", "Blog", "Email", "Video" |
-| `status` | text | `idea`, `draft`, `in_review`, `scheduled`, or `published` |
-| `scheduled_date` | date | nullable |
-| `notes` | text | nullable |
-| `created_by` | uuid | references `auth.users(id)` |
-| `created_at` | timestamptz | default `now()` |
+| column | type |
+|---|---|
+| `id` | uuid |
+| `title` | text |
+| `platform` | text |
+| `content_type` | text |
+| `content_size` | text |
+| `status` | text |
+| `post_date` | date |
+| `post_time` | time without time zone |
+| `caption` | text |
+| `private_note` | text |
+| `partner_note` | text |
+| `canva_link` | text |
+| `file_url` | text |
+| `file_name` | text |
+| `created_by` | uuid, references `auth.users(id)` |
+| `created_at` | timestamptz |
+| `updated_at` | timestamptz |
 
-**If your real table/column names differ, edit `src/lib/schema.js` only** —
-no need to touch any component or page.
+Version 1's UI only reads/writes a subset of these columns (`title`,
+`content_type`, `status`, `post_date`, `caption`) since that's what the
+requested pages needed. The rest (`platform`, `content_size`, `post_time`,
+`private_note`, `partner_note`, `canva_link`, `file_url`, `file_name`) exist
+in the table but aren't surfaced yet — add fields for them in a future
+version if needed.
+
+**Status values were not confirmed against a check constraint.** The app
+uses `idea`, `draft`, `in_review`, `scheduled`, `published` — if your actual
+data uses different strings, update `STATUS` in `src/lib/schema.js`.
 
 ## Assumptions made to ship Version 1
 

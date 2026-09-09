@@ -6,10 +6,10 @@ const CONTENT_TYPES = ['Instagram Post', 'Blog', 'Email', 'Video', 'Newsletter']
 export default function CreateContentModal({ defaultDate, onClose, onCreate, saving }) {
   const [title, setTitle] = useState('')
   const [contentType, setContentType] = useState(CONTENT_TYPES[0])
-  const [scheduledDate, setScheduledDate] = useState(
+  const [postDate, setPostDate] = useState(
     defaultDate.toISOString().slice(0, 10)
   )
-  const [notes, setNotes] = useState('')
+  const [caption, setCaption] = useState('')
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -18,8 +18,8 @@ export default function CreateContentModal({ defaultDate, onClose, onCreate, sav
       title: title.trim(),
       content_type: contentType,
       status: STATUS.IDEA,
-      scheduled_date: scheduledDate,
-      notes: notes.trim() || null,
+      post_date: postDate,
+      caption: caption.trim() || null,
     })
   }
 
@@ -67,8 +67,8 @@ export default function CreateContentModal({ defaultDate, onClose, onCreate, sav
           <label className="flex flex-col gap-1.5">
             <span className="text-sm text-ink-soft">Date</span>
             <input
-              value={scheduledDate}
-              onChange={(e) => setScheduledDate(e.target.value)}
+              value={postDate}
+              onChange={(e) => setPostDate(e.target.value)}
               type="date"
               required
               className="rounded-xl border border-line bg-paper px-3 py-2 text-sm text-ink focus:border-harbor focus:outline-none"
@@ -76,10 +76,10 @@ export default function CreateContentModal({ defaultDate, onClose, onCreate, sav
           </label>
 
           <label className="flex flex-col gap-1.5">
-            <span className="text-sm text-ink-soft">Notes</span>
+            <span className="text-sm text-ink-soft">Caption</span>
             <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
+              value={caption}
+              onChange={(e) => setCaption(e.target.value)}
               rows={3}
               className="resize-none rounded-xl border border-line bg-paper px-3 py-2 text-sm text-ink focus:border-harbor focus:outline-none"
             />

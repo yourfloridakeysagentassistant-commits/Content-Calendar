@@ -1,20 +1,30 @@
 // ---------------------------------------------------------------------------
-// ASSUMED SUPABASE SCHEMA
+// SUPABASE SCHEMA — confirmed against the live database
 // ---------------------------------------------------------------------------
-// The database already exists per project instructions, but its exact table
-// and column names were not provided. Every query in this app reads table
-// and column names from this file ONLY, so if the real schema differs, this
-// is the single place to fix it — no need to hunt through components.
+// Every query in this app reads table and column names from this file ONLY,
+// so if the schema changes later, this is the single place to fix it.
 //
-// Assumed table: content_items
-//   id             uuid        primary key, default gen_random_uuid()
-//   title          text        required
-//   content_type   text        e.g. "Instagram Post", "Blog", "Email", "Video"
-//   status         text        one of: idea | draft | in_review | scheduled | published
-//   scheduled_date date        nullable — date this content is planned to go out
-//   notes          text        nullable
-//   created_by     uuid        references auth.users(id)
-//   created_at     timestamptz default now()
+// Table: content_items
+//   id             uuid                      primary key
+//   title          text
+//   platform       text                      e.g. "Instagram", "Facebook"
+//   content_type   text                      e.g. "Post", "Story", "Reel"
+//   content_size   text
+//   status         text                      workflow state (see STATUS below —
+//                                             exact values were not confirmed
+//                                             against a check constraint, so
+//                                             verify these match your data)
+//   post_date      date
+//   post_time      time without time zone
+//   caption        text
+//   private_note   text
+//   partner_note   text
+//   canva_link     text
+//   file_url       text
+//   file_name      text
+//   created_by     uuid                      references auth.users(id)
+//   created_at     timestamp with time zone
+//   updated_at     timestamp with time zone
 // ---------------------------------------------------------------------------
 
 export const CONTENT_TABLE = 'content_items'
@@ -22,14 +32,26 @@ export const CONTENT_TABLE = 'content_items'
 export const CONTENT_COLUMNS = {
   id: 'id',
   title: 'title',
+  platform: 'platform',
   contentType: 'content_type',
+  contentSize: 'content_size',
   status: 'status',
-  scheduledDate: 'scheduled_date',
-  notes: 'notes',
+  postDate: 'post_date',
+  postTime: 'post_time',
+  caption: 'caption',
+  privateNote: 'private_note',
+  partnerNote: 'partner_note',
+  canvaLink: 'canva_link',
+  fileUrl: 'file_url',
+  fileName: 'file_name',
   createdBy: 'created_by',
   createdAt: 'created_at',
+  updatedAt: 'updated_at',
 }
 
+// Not confirmed against a DB check constraint — these are the same values
+// Version 1 was built against. If your real status values differ, this is
+// the only place that needs to change.
 export const STATUS = {
   IDEA: 'idea',
   DRAFT: 'draft',

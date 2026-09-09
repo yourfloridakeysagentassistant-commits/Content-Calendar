@@ -33,9 +33,9 @@ export default function Calendar() {
     const { data, error: fetchError } = await supabase
       .from(CONTENT_TABLE)
       .select('*')
-      .gte(CONTENT_COLUMNS.scheduledDate, monthRange.start)
-      .lte(CONTENT_COLUMNS.scheduledDate, monthRange.end)
-      .order(CONTENT_COLUMNS.scheduledDate, { ascending: true })
+      .gte(CONTENT_COLUMNS.postDate, monthRange.start)
+      .lte(CONTENT_COLUMNS.postDate, monthRange.end)
+      .order(CONTENT_COLUMNS.postDate, { ascending: true })
 
     if (fetchError) {
       setError(fetchError.message)
@@ -53,7 +53,7 @@ export default function Calendar() {
   const itemCountsByDate = useMemo(() => {
     const counts = {}
     for (const item of items) {
-      const key = item[CONTENT_COLUMNS.scheduledDate]
+      const key = item[CONTENT_COLUMNS.postDate]
       if (!key) continue
       counts[key] = (counts[key] || 0) + 1
     }
@@ -62,7 +62,7 @@ export default function Calendar() {
 
   const selectedDateItems = useMemo(() => {
     const key = toDateKey(selectedDate)
-    return items.filter((item) => item[CONTENT_COLUMNS.scheduledDate] === key)
+    return items.filter((item) => item[CONTENT_COLUMNS.postDate] === key)
   }, [items, selectedDate])
 
   const handleCreate = async (payload) => {

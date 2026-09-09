@@ -15,7 +15,7 @@ export default function Review() {
       .from(CONTENT_TABLE)
       .select('*')
       .eq(CONTENT_COLUMNS.status, STATUS.IN_REVIEW)
-      .order(CONTENT_COLUMNS.scheduledDate, { ascending: true })
+      .order(CONTENT_COLUMNS.postDate, { ascending: true })
 
     if (fetchError) {
       setError(fetchError.message)
@@ -72,8 +72,8 @@ export default function Review() {
                   {item.content_type && (
                     <p className="mt-1 text-xs text-ink-soft">{item.content_type}</p>
                   )}
-                  {item.notes && (
-                    <p className="mt-2 text-sm text-ink-soft">{item.notes}</p>
+                  {item.private_note && (
+                    <p className="mt-2 text-sm text-ink-soft">{item.private_note}</p>
                   )}
                 </div>
                 <div className="flex shrink-0 gap-2">

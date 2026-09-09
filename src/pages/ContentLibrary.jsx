@@ -94,7 +94,7 @@ export default function ContentLibrary() {
                   <td className="px-5 py-3.5 text-ink">{item.title}</td>
                   <td className="px-5 py-3.5 text-ink-soft">{item.content_type || '—'}</td>
                   <td className="px-5 py-3.5 text-ink-soft">
-                    {item.scheduled_date || '—'}
+                    {item.post_date || '—'}
                   </td>
                   <td className="px-5 py-3.5">
                     <span className="rounded-full bg-harbor-soft px-2.5 py-0.5 text-xs text-harbor-dark">
