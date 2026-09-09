@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-line;
+  }
+  body {
+    @apply bg-paper text-ink;
+  }
+  h1, h2, h3 {
+    @apply font-serif;
+  }
+  :focus-visible {
+    outline: 2px solid theme('colors.harbor.DEFAULT');
+    outline-offset: 2px;
+  }
+}
