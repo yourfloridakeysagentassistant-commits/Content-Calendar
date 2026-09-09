@@ -32,6 +32,10 @@ export default {
           dark: '#3D8E73',
           soft: '#DDF2EA',
         },
+        hotpink: {
+          DEFAULT: '#FF3EA5',
+          dark: '#E62690',
+        },
       },
       borderRadius: {
         xl: '14px',

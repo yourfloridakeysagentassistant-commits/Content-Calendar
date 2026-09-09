@@ -165,7 +165,7 @@ export default function CreateContentModal({ defaultDate, onClose, onCreate, sav
           <button
             type="submit"
             disabled={saving}
-            className="rounded-xl bg-coral px-4 py-2 text-sm font-medium text-white hover:bg-coral-dark disabled:opacity-60"
+            className="rounded-xl bg-hotpink px-4 py-2 text-sm font-medium text-white hover:bg-hotpink-dark disabled:opacity-60"
           >
             {saving ? 'Saving…' : 'Create'}
           </button>

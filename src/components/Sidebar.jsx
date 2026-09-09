@@ -35,7 +35,7 @@ export default function Sidebar({ onNavigate }) {
         <button
           type="button"
           onClick={handleCreate}
-          className="w-full rounded-xl bg-coral px-3 py-2.5 text-sm font-medium text-white hover:bg-coral-dark"
+          className="w-full rounded-xl bg-hotpink px-3 py-2.5 text-sm font-medium text-white hover:bg-hotpink-dark"
         >
           + Create Content
         </button>

@@ -14,7 +14,7 @@ export default function ViewToggle({ view, onChange }) {
           onClick={() => onChange(v.key)}
           className={`rounded-lg px-3 py-1.5 text-sm transition-colors ${
             view === v.key
-              ? 'bg-harbor text-white'
+              ? 'bg-hotpink text-white'
               : 'text-ink-soft hover:bg-paper'
           }`}
         >

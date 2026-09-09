@@ -180,7 +180,7 @@ export default function Calendar() {
           <button
             type="button"
             onClick={() => openCreateModal(selectedDate)}
-            className="rounded-xl bg-coral px-4 py-2.5 text-sm font-medium text-white hover:bg-coral-dark"
+            className="rounded-xl bg-hotpink px-4 py-2.5 text-sm font-medium text-white hover:bg-hotpink-dark"
           >
             + Create Content
           </button>
