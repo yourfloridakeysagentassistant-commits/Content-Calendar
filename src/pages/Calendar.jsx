@@ -21,9 +21,7 @@ export default function Calendar() {
   const location = useLocation()
   const navigate = useNavigate()
 
-  const [view, setView] = useState(() =>
-    typeof window !== 'undefined' && window.innerWidth < 640 ? 'list' : 'month'
-  )
+  const [view, setView] = useState('month')
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [modalOpen, setModalOpen] = useState(false)
