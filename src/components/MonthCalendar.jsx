@@ -125,16 +125,16 @@ export default function MonthCalendar({
                 {cellDate.getDate()}
               </span>
 
-              {/* Mobile: compact colored dots only */}
+              {/* Mobile: bold colored bars instead of tiny dots */}
               {dayItems.length > 0 && (
-                <div className="flex flex-wrap gap-0.5 md:hidden">
-                  {dayItems.slice(0, 4).map((item) => {
+                <div className="flex flex-col gap-0.5 md:hidden">
+                  {dayItems.slice(0, 3).map((item) => {
                     const style = getPlatformStyle(item.platform)
                     return (
                       <span
                         key={item.id}
-                        className="h-1.5 w-1.5 rounded-full"
-                        style={{ backgroundColor: style.text }}
+                        className="block h-1.5 w-full rounded-full"
+                        style={{ backgroundColor: style.accent }}
                       />
                     )
                   })}
