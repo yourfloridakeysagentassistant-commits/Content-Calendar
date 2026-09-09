@@ -5,27 +5,29 @@ import { PLATFORM_STYLES } from '../lib/platforms.js'
 const PLATFORMS = Object.keys(PLATFORM_STYLES)
 const CONTENT_TYPES = ['Post', 'Story', 'Reel', 'Carousel', 'Blog', 'Email', 'Video']
 
-export default function CreateContentModal({ defaultDate, onClose, onCreate, saving, error }) {
-  const [title, setTitle] = useState('')
-  const [platform, setPlatform] = useState(PLATFORMS[0])
-  const [contentType, setContentType] = useState(CONTENT_TYPES[0])
+export default function CreateContentModal({ defaultDate, onClose, onSubmit, saving, error, editItem }) {
+  const isEditing = Boolean(editItem)
+
+  const [title, setTitle] = useState(editItem?.title || '')
+  const [platform, setPlatform] = useState(editItem?.platform || PLATFORMS[0])
+  const [contentType, setContentType] = useState(editItem?.content_type || CONTENT_TYPES[0])
   const [postDate, setPostDate] = useState(
-    defaultDate.toISOString().slice(0, 10)
+    editItem?.post_date || defaultDate.toISOString().slice(0, 10)
   )
-  const [postTime, setPostTime] = useState('')
-  const [caption, setCaption] = useState('')
-  const [note, setNote] = useState('')
+  const [postTime, setPostTime] = useState(editItem?.post_time?.slice(0, 5) || '')
+  const [caption, setCaption] = useState(editItem?.caption || '')
+  const [note, setNote] = useState(editItem?.private_note || '')
   const [file, setFile] = useState(null)
 
   const handleSubmit = (e) => {
     e.preventDefault()
     if (!title.trim()) return
-    onCreate(
+    onSubmit(
       {
         title: title.trim(),
         platform,
         content_type: contentType,
-        status: STATUS.IDEA,
+        status: editItem?.status || STATUS.IDEA,
         post_date: postDate,
         post_time: postTime || null,
         caption: caption.trim() || null,
@@ -44,9 +46,9 @@ export default function CreateContentModal({ defaultDate, onClose, onCreate, sav
       />
       <form
         onSubmit={handleSubmit}
-        className="relative z-10 w-full max-w-md rounded-t-2xl border border-line bg-paper-raised p-6 shadow-soft md:rounded-2xl"
+        className="relative z-10 max-h-[90vh] w-full max-w-md overflow-y-auto rounded-t-2xl border border-line bg-paper-raised p-6 shadow-soft md:rounded-2xl"
       >
-        <h2 className="font-serif text-xl text-ink">New content</h2>
+        <h2 className="font-serif text-xl text-ink">{isEditing ? 'Edit content' : 'New content'}</h2>
 
         <div className="mt-5 flex flex-col gap-4">
           <label className="flex flex-col gap-1.5">
@@ -117,7 +119,9 @@ export default function CreateContentModal({ defaultDate, onClose, onCreate, sav
           </div>
 
           <label className="flex flex-col gap-1.5">
-            <span className="text-sm text-ink-soft">Photo or video</span>
+            <span className="text-sm text-ink-soft">
+              {isEditing && editItem?.file_name ? `Replace photo/video (current: ${editItem.file_name})` : 'Photo or video'}
+            </span>
             <input
               type="file"
               accept="image/*,video/*"
@@ -167,7 +171,7 @@ export default function CreateContentModal({ defaultDate, onClose, onCreate, sav
             disabled={saving}
             className="rounded-xl bg-hotpink px-4 py-2 text-sm font-medium text-white hover:bg-hotpink-dark disabled:opacity-60"
           >
-            {saving ? 'Saving…' : 'Create'}
+            {saving ? 'Saving…' : isEditing ? 'Save' : 'Create'}
           </button>
         </div>
       </form>

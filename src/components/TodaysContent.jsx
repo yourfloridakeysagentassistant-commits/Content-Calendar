@@ -10,7 +10,7 @@ function formatTime(timeString) {
   return `${hour12}:${m} ${period}`
 }
 
-export default function TodaysContent({ date, items, loading, onAdd, onDelete, deletingId }) {
+export default function TodaysContent({ date, items, loading, onAdd, onEdit, onDelete, deletingId }) {
   const label = date.toLocaleDateString('en-US', {
     weekday: 'long',
     month: 'long',
@@ -46,7 +46,8 @@ export default function TodaysContent({ date, items, loading, onAdd, onDelete, d
             return (
               <li
                 key={item.id}
-                className="rounded-xl px-3.5 py-3"
+                onClick={() => onEdit?.(item)}
+                className={`rounded-xl px-3.5 py-3 ${onEdit ? 'cursor-pointer' : ''}`}
                 style={{ backgroundColor: style.bg, color: style.text }}
               >
                 <div className="flex items-start justify-between gap-2">
@@ -57,7 +58,8 @@ export default function TodaysContent({ date, items, loading, onAdd, onDelete, d
                   {onDelete && (
                     <button
                       type="button"
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation()
                         if (window.confirm(`Delete "${item.title}"? This can't be undone.`)) {
                           onDelete(item.id)
                         }

@@ -16,7 +16,7 @@ function formatTime(timeString) {
   return `${hour12}:${m} ${period}`
 }
 
-export default function ListView({ itemsByDate, onSelectDate }) {
+export default function ListView({ itemsByDate, onSelectDate, onEditItem }) {
   const sortedDates = Object.keys(itemsByDate).sort()
 
   if (sortedDates.length === 0) {
@@ -45,7 +45,8 @@ export default function ListView({ itemsByDate, onSelectDate }) {
                 return (
                   <div
                     key={item.id}
-                    className="flex items-center gap-2 rounded-lg px-2.5 py-1.5"
+                    onClick={() => onEditItem?.(item)}
+                    className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5"
                     style={{ backgroundColor: style.bg, color: style.text }}
                   >
                     <PlatformIcon icon={style.icon} className="shrink-0" />

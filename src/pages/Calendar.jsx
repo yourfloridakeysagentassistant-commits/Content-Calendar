@@ -25,6 +25,7 @@ export default function Calendar() {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [modalOpen, setModalOpen] = useState(false)
+  const [editItem, setEditItem] = useState(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(null)
   const [createError, setCreateError] = useState(null)
@@ -78,11 +79,18 @@ export default function Calendar() {
   const openCreateModal = useCallback(
     (date) => {
       if (date) setSelectedDate(date)
+      setEditItem(null)
       setCreateError(null)
       setModalOpen(true)
     },
     [setSelectedDate]
   )
+
+  const openEditModal = useCallback((item) => {
+    setEditItem(item)
+    setCreateError(null)
+    setModalOpen(true)
+  }, [])
 
   // Sidebar's "Create Content" button navigates here with this flag set.
   useEffect(() => {
@@ -93,7 +101,27 @@ export default function Calendar() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.state])
 
-  const handleCreate = async (payload, file) => {
+  const uploadFile = async (file, userId) => {
+    const filePath = `${userId}/${Date.now()}-${file.name}`
+    const { error: uploadError } = await supabase.storage
+      .from('content-uploads')
+      .upload(filePath, file)
+
+    if (uploadError) throw new Error(`File upload failed: ${uploadError.message}`)
+
+    const { data: signedUrlData, error: signedUrlError } = await supabase.storage
+      .from('content-uploads')
+      .createSignedUrl(filePath, 60 * 60 * 24 * 365) // valid 1 year
+
+    if (signedUrlError) throw new Error(`File uploaded but couldn't generate a link: ${signedUrlError.message}`)
+
+    return {
+      [CONTENT_COLUMNS.fileUrl]: signedUrlData?.signedUrl || null,
+      [CONTENT_COLUMNS.fileName]: file.name,
+    }
+  }
+
+  const handleSubmit = async (payload, file) => {
     setSaving(true)
     setCreateError(null)
     const { data: userData } = await supabase.auth.getUser()
@@ -101,47 +129,36 @@ export default function Calendar() {
 
     let fileFields = {}
     if (file) {
-      const filePath = `${userId}/${Date.now()}-${file.name}`
-      const { error: uploadError } = await supabase.storage
-        .from('content-uploads')
-        .upload(filePath, file)
-
-      if (uploadError) {
+      try {
+        fileFields = await uploadFile(file, userId)
+      } catch (err) {
         setSaving(false)
-        setCreateError(`File upload failed: ${uploadError.message}`)
+        setCreateError(err.message)
         return
-      }
-
-      const { data: signedUrlData, error: signedUrlError } = await supabase.storage
-        .from('content-uploads')
-        .createSignedUrl(filePath, 60 * 60 * 24 * 365) // valid 1 year
-
-      if (signedUrlError) {
-        setSaving(false)
-        setCreateError(`File uploaded but couldn't generate a link: ${signedUrlError.message}`)
-        return
-      }
-
-      fileFields = {
-        [CONTENT_COLUMNS.fileUrl]: signedUrlData?.signedUrl || null,
-        [CONTENT_COLUMNS.fileName]: file.name,
       }
     }
 
-    const { error: insertError } = await supabase.from(CONTENT_TABLE).insert({
-      ...payload,
-      ...fileFields,
-      [CONTENT_COLUMNS.createdBy]: userId,
-    })
+    const isEditing = Boolean(editItem)
+    const { error: saveError } = isEditing
+      ? await supabase
+          .from(CONTENT_TABLE)
+          .update({ ...payload, ...fileFields })
+          .eq(CONTENT_COLUMNS.id, editItem.id)
+      : await supabase.from(CONTENT_TABLE).insert({
+          ...payload,
+          ...fileFields,
+          [CONTENT_COLUMNS.createdBy]: userId,
+        })
 
     setSaving(false)
 
-    if (insertError) {
-      setCreateError(insertError.message)
+    if (saveError) {
+      setCreateError(saveError.message)
       return
     }
 
     setModalOpen(false)
+    setEditItem(null)
     fetchItems()
   }
 
@@ -202,6 +219,7 @@ export default function Calendar() {
               selectedDate={selectedDate}
               onSelectDate={setSelectedDate}
               onAddForDate={openCreateModal}
+              onEditItem={openEditModal}
               itemsByDate={itemsByDate}
             />
           )}
@@ -210,11 +228,16 @@ export default function Calendar() {
               selectedDate={selectedDate}
               onSelectDate={setSelectedDate}
               onAddForDate={openCreateModal}
+              onEditItem={openEditModal}
               itemsByDate={itemsByDate}
             />
           )}
           {view === 'list' && (
-            <ListView itemsByDate={itemsByDate} onSelectDate={setSelectedDate} />
+            <ListView
+              itemsByDate={itemsByDate}
+              onSelectDate={setSelectedDate}
+              onEditItem={openEditModal}
+            />
           )}
           <PlatformLegend />
         </div>
@@ -224,6 +247,7 @@ export default function Calendar() {
             items={selectedDateItems}
             loading={loading}
             onAdd={() => openCreateModal(selectedDate)}
+            onEdit={openEditModal}
             onDelete={handleDelete}
             deletingId={deletingId}
           />
@@ -234,8 +258,12 @@ export default function Calendar() {
       {modalOpen && (
         <CreateContentModal
           defaultDate={selectedDate}
-          onClose={() => setModalOpen(false)}
-          onCreate={handleCreate}
+          editItem={editItem}
+          onClose={() => {
+            setModalOpen(false)
+            setEditItem(null)
+          }}
+          onSubmit={handleSubmit}
           saving={saving}
           error={createError}
         />

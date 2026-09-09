@@ -37,6 +37,7 @@ export default function MonthCalendar({
   selectedDate,
   onSelectDate,
   onAddForDate,
+  onEditItem,
   itemsByDate,
 }) {
   const year = currentMonth.getFullYear()
@@ -100,14 +101,21 @@ export default function MonthCalendar({
           const overflowCount = dayItems.length - visibleItems.length
 
           return (
-            <button
+            <div
               key={key}
-              type="button"
+              role="button"
+              tabIndex={0}
               onClick={() => {
                 onSelectDate(cellDate)
                 if (dayItems.length === 0) onAddForDate?.(cellDate)
               }}
-              className={`flex min-h-[52px] flex-col gap-1 p-1 text-left align-top transition-colors md:min-h-[92px] md:p-1.5 ${
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  onSelectDate(cellDate)
+                  if (dayItems.length === 0) onAddForDate?.(cellDate)
+                }
+              }}
+              className={`group relative flex min-h-[52px] cursor-pointer flex-col gap-1 p-1 text-left align-top transition-colors md:min-h-[92px] md:p-1.5 ${
                 isSelected
                   ? 'ring-2 ring-inset ring-harbor bg-paper-raised'
                   : isToday
@@ -117,6 +125,19 @@ export default function MonthCalendar({
                   : 'bg-paper-raised hover:bg-paper'
               } ${!inCurrentMonth ? 'opacity-40' : ''}`}
             >
+              {dayItems.length > 0 && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onAddForDate?.(cellDate)
+                  }}
+                  aria-label="Add content to this day"
+                  className="absolute right-1 top-1 hidden h-4 w-4 items-center justify-center rounded-full bg-hotpink text-[10px] leading-none text-white hover:bg-hotpink-dark md:flex"
+                >
+                  +
+                </button>
+              )}
               <span
                 className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-xs ${
                   isToday ? 'bg-harbor font-medium text-white' : 'text-ink-soft'
@@ -148,7 +169,11 @@ export default function MonthCalendar({
                   return (
                     <div
                       key={item.id}
-                      className="rounded-md px-1.5 py-1 leading-tight"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onEditItem?.(item)
+                      }}
+                      className="cursor-pointer rounded-md px-1.5 py-1 leading-tight"
                       style={{ backgroundColor: style.bg, color: style.text }}
                     >
                       <div className="flex items-center gap-1">
@@ -175,7 +200,7 @@ export default function MonthCalendar({
                   <span className="px-1.5 text-[10px] text-ink-soft">+{overflowCount} more</span>
                 )}
               </div>
-            </button>
+            </div>
           )
         })}
       </div>

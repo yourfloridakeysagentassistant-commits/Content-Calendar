@@ -26,7 +26,7 @@ function getWeekDates(anchorDate) {
   })
 }
 
-export default function WeekView({ selectedDate, onSelectDate, onAddForDate, itemsByDate }) {
+export default function WeekView({ selectedDate, onSelectDate, onAddForDate, onEditItem, itemsByDate }) {
   const weekDates = getWeekDates(selectedDate)
   const today = toDateKey(new Date())
 
@@ -72,7 +72,8 @@ export default function WeekView({ selectedDate, onSelectDate, onAddForDate, ite
                   return (
                     <div
                       key={item.id}
-                      className="rounded-md px-2 py-1.5"
+                      onClick={() => onEditItem?.(item)}
+                      className="cursor-pointer rounded-md px-2 py-1.5"
                       style={{ backgroundColor: style.bg, color: style.text }}
                     >
                       <div className="flex items-center gap-1">
