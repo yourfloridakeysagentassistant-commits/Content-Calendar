@@ -147,17 +147,27 @@ export default function MonthCalendar({
                 {cellDate.getDate()}
               </span>
 
-              {/* Mobile: bold colored bars instead of tiny dots */}
+              {/* Mobile: bold colored bars, each individually tappable to edit */}
               {dayItems.length > 0 && (
-                <div className="flex flex-col gap-0.5 md:hidden">
+                <div className="flex flex-col gap-1 md:hidden">
                   {dayItems.slice(0, 3).map((item) => {
                     const style = getPlatformStyle(item.platform)
                     return (
-                      <span
+                      <button
                         key={item.id}
-                        className="block h-1.5 w-full rounded-full"
-                        style={{ backgroundColor: style.accent }}
-                      />
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onEditItem?.(item)
+                        }}
+                        className="block w-full rounded-full py-1"
+                        aria-label={`Edit ${item.title}`}
+                      >
+                        <span
+                          className="block h-1.5 w-full rounded-full"
+                          style={{ backgroundColor: style.accent }}
+                        />
+                      </button>
                     )
                   })}
                 </div>
