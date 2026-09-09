@@ -35,7 +35,10 @@ export default function TodaysContent({ date, items, loading, onAdd, onDelete, d
       {loading ? (
         <p className="mt-4 text-sm text-ink-soft">Loading…</p>
       ) : items.length === 0 ? (
-        <p className="mt-4 text-sm text-ink-soft">Nothing planned for this day yet.</p>
+        <div className="mt-4 flex flex-col items-center gap-2 rounded-xl bg-paper py-6 text-center">
+          <PlatformIcon icon="doc" className="text-ink-soft/50" />
+          <p className="text-sm text-ink-soft">Nothing planned for this day yet.</p>
+        </div>
       ) : (
         <ul className="mt-4 flex flex-col gap-2.5">
           {items.map((item) => {

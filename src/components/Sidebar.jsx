@@ -1,14 +1,15 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import MiniCalendar from './MiniCalendar.jsx'
+import NavIcon from './NavIcon.jsx'
 
 const NAV_ITEMS = [
-  { to: '/', label: 'Calendar' },
-  { to: '/ideas', label: 'Ideas' },
-  { to: '/library', label: 'Content Library' },
-  { to: '/review', label: 'Review' },
-  { to: '/analytics', label: 'Analytics' },
-  { to: '/brand-assets', label: 'Brand Assets' },
-  { to: '/settings', label: 'Settings' },
+  { to: '/', label: 'Calendar', icon: 'calendar' },
+  { to: '/ideas', label: 'Ideas', icon: 'idea' },
+  { to: '/library', label: 'Content Library', icon: 'library' },
+  { to: '/review', label: 'Review', icon: 'review' },
+  { to: '/analytics', label: 'Analytics', icon: 'analytics' },
+  { to: '/brand-assets', label: 'Brand Assets', icon: 'brand' },
+  { to: '/settings', label: 'Settings', icon: 'settings' },
 ]
 
 export default function Sidebar({ onNavigate }) {
@@ -48,13 +49,14 @@ export default function Sidebar({ onNavigate }) {
             end={item.to === '/'}
             onClick={onNavigate}
             className={({ isActive }) =>
-              `rounded-xl px-3 py-2.5 text-[15px] transition-colors ${
+              `flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-[15px] transition-colors ${
                 isActive
                   ? 'bg-harbor-soft text-harbor-dark font-medium'
                   : 'text-ink-soft hover:bg-paper hover:text-ink'
               }`
             }
           >
+            <NavIcon icon={item.icon} className="shrink-0" />
             {item.label}
           </NavLink>
         ))}

@@ -94,6 +94,7 @@ export default function MonthCalendar({
           const inCurrentMonth = cellDate.getMonth() === month
           const isToday = key === today
           const isSelected = key === toDateKey(selectedDate)
+          const isWeekend = cellDate.getDay() === 0 || cellDate.getDay() === 6
           const dayItems = itemsByDate?.[key] || []
           const visibleItems = dayItems.slice(0, MAX_VISIBLE_PER_DAY)
           const overflowCount = dayItems.length - visibleItems.length
@@ -106,8 +107,14 @@ export default function MonthCalendar({
                 onSelectDate(cellDate)
                 if (dayItems.length === 0) onAddForDate?.(cellDate)
               }}
-              className={`flex min-h-[52px] flex-col gap-1 bg-paper-raised p-1 text-left align-top transition-colors md:min-h-[92px] md:p-1.5 ${
-                isSelected ? 'ring-2 ring-inset ring-harbor' : 'hover:bg-paper'
+              className={`flex min-h-[52px] flex-col gap-1 p-1 text-left align-top transition-colors md:min-h-[92px] md:p-1.5 ${
+                isSelected
+                  ? 'ring-2 ring-inset ring-harbor bg-paper-raised'
+                  : isToday
+                  ? 'ring-1 ring-inset ring-coral/50 bg-coral-soft/40 hover:bg-coral-soft/60'
+                  : isWeekend
+                  ? 'bg-paper hover:bg-line/40'
+                  : 'bg-paper-raised hover:bg-paper'
               } ${!inCurrentMonth ? 'opacity-40' : ''}`}
             >
               <span

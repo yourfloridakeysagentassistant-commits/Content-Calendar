@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabaseClient.js'
 import { CONTENT_TABLE, CONTENT_COLUMNS, STATUS } from '../lib/schema.js'
+import PlatformIcon from './PlatformIcon.jsx'
 
 export default function QuickIdea() {
   const [value, setValue] = useState('')
@@ -30,7 +31,10 @@ export default function QuickIdea() {
 
   return (
     <div className="rounded-2xl border border-line bg-paper-raised p-5 shadow-soft">
-      <h2 className="font-serif text-lg text-ink">Quick idea</h2>
+      <h2 className="flex items-center gap-1.5 font-serif text-lg text-ink">
+        <PlatformIcon icon="bulb" className="text-coral" />
+        Quick idea
+      </h2>
       <textarea
         value={value}
         onChange={(e) => setValue(e.target.value)}

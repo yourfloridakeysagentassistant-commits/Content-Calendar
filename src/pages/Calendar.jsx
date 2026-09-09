@@ -21,7 +21,9 @@ export default function Calendar() {
   const location = useLocation()
   const navigate = useNavigate()
 
-  const [view, setView] = useState('month')
+  const [view, setView] = useState(() =>
+    typeof window !== 'undefined' && window.innerWidth < 640 ? 'list' : 'month'
+  )
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [modalOpen, setModalOpen] = useState(false)
@@ -164,6 +166,15 @@ export default function Calendar() {
 
   return (
     <div className="mx-auto max-w-6xl px-3 py-5 sm:px-5 sm:py-6 md:px-8 md:py-8">
+      <div className="mb-5 sm:hidden">
+        <span className="block font-serif text-lg leading-tight text-ink">
+          Your Florida Keys Agent
+        </span>
+        <span className="block text-[10px] font-medium tracking-[0.15em] text-ink-soft">
+          CONTENT CALENDAR
+        </span>
+      </div>
+
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-serif text-2xl text-ink">Calendar</h1>
         <div className="flex items-center gap-3">
