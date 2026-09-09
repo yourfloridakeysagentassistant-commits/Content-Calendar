@@ -1,4 +1,8 @@
-const WEEKDAYS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
+import { getPlatformStyle } from '../lib/platforms.js'
+import PlatformIcon from './PlatformIcon.jsx'
+
+const WEEKDAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
+const MAX_VISIBLE_PER_DAY = 3
 
 function toDateKey(date) {
   return date.toISOString().slice(0, 10)
@@ -18,12 +22,21 @@ function buildMonthGrid(year, month) {
   return cells
 }
 
+function formatTime(timeString) {
+  if (!timeString) return null
+  const [h, m] = timeString.split(':')
+  const hour = Number(h)
+  const period = hour >= 12 ? 'PM' : 'AM'
+  const hour12 = hour % 12 === 0 ? 12 : hour % 12
+  return `${hour12}:${m} ${period}`
+}
+
 export default function MonthCalendar({
   currentMonth,
   onMonthChange,
   selectedDate,
   onSelectDate,
-  itemCountsByDate,
+  itemsByDate,
 }) {
   const year = currentMonth.getFullYear()
   const month = currentMonth.getMonth()
@@ -41,7 +54,7 @@ export default function MonthCalendar({
   return (
     <div className="rounded-2xl border border-line bg-paper-raised p-5 shadow-soft md:p-6">
       <div className="mb-5 flex items-center justify-between">
-        <h2 className="font-serif text-xl text-ink">{monthLabel}</h2>
+        <h2 className="font-serif text-2xl text-ink">{monthLabel}</h2>
         <div className="flex items-center gap-1">
           <button
             type="button"
@@ -66,45 +79,66 @@ export default function MonthCalendar({
         </div>
       </div>
 
-      <div className="grid grid-cols-7 gap-1 text-center text-xs text-ink-soft">
-        {WEEKDAYS.map((day, i) => (
-          <div key={`${day}-${i}`} className="py-2">
+      <div className="grid grid-cols-7 gap-px overflow-hidden rounded-xl border border-line bg-line text-center text-[11px] font-medium tracking-wide text-ink-soft">
+        {WEEKDAYS.map((day) => (
+          <div key={day} className="bg-paper py-2">
             {day}
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7 gap-px overflow-hidden rounded-b-xl border-x border-b border-line bg-line">
         {cells.map((cellDate) => {
           const key = toDateKey(cellDate)
           const inCurrentMonth = cellDate.getMonth() === month
           const isToday = key === today
           const isSelected = key === toDateKey(selectedDate)
-          const count = itemCountsByDate?.[key] || 0
+          const dayItems = itemsByDate?.[key] || []
+          const visibleItems = dayItems.slice(0, MAX_VISIBLE_PER_DAY)
+          const overflowCount = dayItems.length - visibleItems.length
 
           return (
             <button
               key={key}
               type="button"
               onClick={() => onSelectDate(cellDate)}
-              className={`flex aspect-square flex-col items-center justify-center gap-1 rounded-xl text-sm transition-colors ${
-                isSelected
-                  ? 'bg-harbor text-white'
-                  : isToday
-                  ? 'bg-harbor-soft text-harbor-dark font-medium'
-                  : inCurrentMonth
-                  ? 'text-ink hover:bg-paper'
-                  : 'text-ink-soft/40 hover:bg-paper'
-              }`}
+              className={`flex min-h-[92px] flex-col gap-1 bg-paper-raised p-1.5 text-left align-top transition-colors ${
+                isSelected ? 'ring-2 ring-inset ring-harbor' : 'hover:bg-paper'
+              } ${!inCurrentMonth ? 'opacity-40' : ''}`}
             >
-              <span>{cellDate.getDate()}</span>
-              {count > 0 && (
-                <span
-                  className={`h-1 w-1 rounded-full ${
-                    isSelected ? 'bg-white' : 'bg-harbor'
-                  }`}
-                />
-              )}
+              <span
+                className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-xs ${
+                  isToday ? 'bg-harbor font-medium text-white' : 'text-ink-soft'
+                }`}
+              >
+                {cellDate.getDate()}
+              </span>
+
+              <div className="flex flex-col gap-1">
+                {visibleItems.map((item) => {
+                  const style = getPlatformStyle(item.platform)
+                  return (
+                    <div
+                      key={item.id}
+                      className="rounded-md px-1.5 py-1 leading-tight"
+                      style={{ backgroundColor: style.bg, color: style.text }}
+                    >
+                      <div className="flex items-center gap-1">
+                        <PlatformIcon icon={style.icon} className="shrink-0" />
+                        <span className="truncate text-[11px] font-medium">{item.title}</span>
+                      </div>
+                      {(item.content_type || item.post_time) && (
+                        <div className="truncate text-[10px] opacity-80">
+                          {[item.content_type, formatTime(item.post_time)].filter(Boolean).join(' · ')}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+                {overflowCount > 0 && (
+                  <span className="px-1.5 text-[10px] text-ink-soft">+{overflowCount} more</span>
+                )}
+              </div>
             </button>
           )
         })}

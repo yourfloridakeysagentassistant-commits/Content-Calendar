@@ -12,7 +12,12 @@ export default function Sidebar({ onNavigate }) {
   return (
     <aside className="h-full w-full bg-paper-raised">
       <div className="px-6 py-7">
-        <span className="font-serif text-xl tracking-tight text-ink">Content Calendar</span>
+        <span className="block font-serif text-xl leading-tight tracking-tight text-ink">
+          Your Florida Keys Agent
+        </span>
+        <span className="mt-0.5 block text-[11px] font-medium tracking-[0.15em] text-ink-soft">
+          CONTENT CALENDAR
+        </span>
       </div>
       <nav className="flex flex-col gap-1 px-3">
         {NAV_ITEMS.map((item) => (

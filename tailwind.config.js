@@ -18,9 +18,19 @@ export default {
         },
         line: '#E7E5E0',
         harbor: {
-          DEFAULT: '#2F5D62',
-          soft: '#E4EDEC',
-          dark: '#234648',
+          DEFAULT: '#1F3A4D',
+          soft: '#E7EEF2',
+          dark: '#152A38',
+        },
+        coral: {
+          DEFAULT: '#F2795F',
+          dark: '#E0684E',
+          soft: '#FCE3DB',
+        },
+        mint: {
+          DEFAULT: '#4FAF8F',
+          dark: '#3D8E73',
+          soft: '#DDF2EA',
         },
       },
       borderRadius: {

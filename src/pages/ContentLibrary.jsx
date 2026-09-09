@@ -1,6 +1,8 @@
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import { supabase } from '../lib/supabaseClient.js'
 import { CONTENT_TABLE, CONTENT_COLUMNS } from '../lib/schema.js'
+import { getPlatformStyle } from '../lib/platforms.js'
+import PlatformIcon from '../components/PlatformIcon.jsx'
 
 const STATUS_LABEL = {
   idea: 'Idea',
@@ -83,26 +85,39 @@ export default function ContentLibrary() {
             <thead>
               <tr className="border-b border-line text-ink-soft">
                 <th className="px-5 py-3 font-normal">Title</th>
+                <th className="px-5 py-3 font-normal">Platform</th>
                 <th className="px-5 py-3 font-normal">Type</th>
                 <th className="px-5 py-3 font-normal">Date</th>
                 <th className="px-5 py-3 font-normal">Status</th>
               </tr>
             </thead>
             <tbody>
-              {filteredItems.map((item) => (
-                <tr key={item.id} className="border-b border-line last:border-0">
-                  <td className="px-5 py-3.5 text-ink">{item.title}</td>
-                  <td className="px-5 py-3.5 text-ink-soft">{item.content_type || '—'}</td>
-                  <td className="px-5 py-3.5 text-ink-soft">
-                    {item.post_date || '—'}
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <span className="rounded-full bg-harbor-soft px-2.5 py-0.5 text-xs text-harbor-dark">
-                      {STATUS_LABEL[item.status] || item.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
+              {filteredItems.map((item) => {
+                const style = getPlatformStyle(item.platform)
+                return (
+                  <tr key={item.id} className="border-b border-line last:border-0">
+                    <td className="px-5 py-3.5 text-ink">{item.title}</td>
+                    <td className="px-5 py-3.5">
+                      <span
+                        className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs"
+                        style={{ backgroundColor: style.bg, color: style.text }}
+                      >
+                        <PlatformIcon icon={style.icon} />
+                        {style.label}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3.5 text-ink-soft">{item.content_type || '—'}</td>
+                    <td className="px-5 py-3.5 text-ink-soft">
+                      {item.post_date || '—'}
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <span className="rounded-full bg-harbor-soft px-2.5 py-0.5 text-xs text-harbor-dark">
+                        {STATUS_LABEL[item.status] || item.status}
+                      </span>
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>

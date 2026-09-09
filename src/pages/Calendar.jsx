@@ -4,6 +4,8 @@ import { CONTENT_TABLE, CONTENT_COLUMNS } from '../lib/schema.js'
 import MonthCalendar from '../components/MonthCalendar.jsx'
 import TodaysContent from '../components/TodaysContent.jsx'
 import CreateContentModal from '../components/CreateContentModal.jsx'
+import PlatformLegend from '../components/PlatformLegend.jsx'
+import QuickIdea from '../components/QuickIdea.jsx'
 
 function toDateKey(date) {
   return date.toISOString().slice(0, 10)
@@ -35,7 +37,7 @@ export default function Calendar() {
       .select('*')
       .gte(CONTENT_COLUMNS.postDate, monthRange.start)
       .lte(CONTENT_COLUMNS.postDate, monthRange.end)
-      .order(CONTENT_COLUMNS.postDate, { ascending: true })
+      .order(CONTENT_COLUMNS.postTime, { ascending: true })
 
     if (fetchError) {
       setError(fetchError.message)
@@ -50,20 +52,21 @@ export default function Calendar() {
     fetchItems()
   }, [fetchItems])
 
-  const itemCountsByDate = useMemo(() => {
-    const counts = {}
+  const itemsByDate = useMemo(() => {
+    const grouped = {}
     for (const item of items) {
       const key = item[CONTENT_COLUMNS.postDate]
       if (!key) continue
-      counts[key] = (counts[key] || 0) + 1
+      if (!grouped[key]) grouped[key] = []
+      grouped[key].push(item)
     }
-    return counts
+    return grouped
   }, [items])
 
   const selectedDateItems = useMemo(() => {
     const key = toDateKey(selectedDate)
-    return items.filter((item) => item[CONTENT_COLUMNS.postDate] === key)
-  }, [items, selectedDate])
+    return itemsByDate[key] || []
+  }, [itemsByDate, selectedDate])
 
   const handleCreate = async (payload) => {
     setSaving(true)
@@ -92,9 +95,9 @@ export default function Calendar() {
         <button
           type="button"
           onClick={() => setModalOpen(true)}
-          className="rounded-xl bg-harbor px-4 py-2.5 text-sm font-medium text-white hover:bg-harbor-dark"
+          className="rounded-xl bg-coral px-4 py-2.5 text-sm font-medium text-white hover:bg-coral-dark"
         >
-          Create Content
+          + Create Content
         </button>
       </div>
 
@@ -105,14 +108,20 @@ export default function Calendar() {
       )}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr,340px]">
-        <MonthCalendar
-          currentMonth={currentMonth}
-          onMonthChange={setCurrentMonth}
-          selectedDate={selectedDate}
-          onSelectDate={setSelectedDate}
-          itemCountsByDate={itemCountsByDate}
-        />
-        <TodaysContent date={selectedDate} items={selectedDateItems} loading={loading} />
+        <div>
+          <MonthCalendar
+            currentMonth={currentMonth}
+            onMonthChange={setCurrentMonth}
+            selectedDate={selectedDate}
+            onSelectDate={setSelectedDate}
+            itemsByDate={itemsByDate}
+          />
+          <PlatformLegend />
+        </div>
+        <div className="flex flex-col gap-6">
+          <TodaysContent date={selectedDate} items={selectedDateItems} loading={loading} />
+          <QuickIdea />
+        </div>
       </div>
 
       {modalOpen && (
